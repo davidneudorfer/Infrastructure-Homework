@@ -1,0 +1,10 @@
+---
+- name: Install memcached
+  yum: name=memcached state=present
+  
+#- name: Configure Memcached to listen to the rest of the network
+#  template: src=memcached.conf.j2 dest=/etc/memcached.conf
+#
+- name: restart memcached
+  service: name=memcached state=restarted
+  sudo: yes

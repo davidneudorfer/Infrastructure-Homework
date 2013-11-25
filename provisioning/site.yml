@@ -1,0 +1,25 @@
+---
+# Warby Parker Infrastructure
+
+# common configuration
+- hosts: all
+  sudo: yes
+  roles:
+  - common
+
+# configure and deploy the application server
+- hosts: app
+  sudo: yes
+  roles:
+  - apache
+  - mysql
+  - php
+  - iptables-app
+  
+# configure and deploy the frontend servers.
+- hosts: front
+  sudo: yes
+  roles:
+  - nginx
+  - memcached
+  - iptables-front

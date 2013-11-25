@@ -1,0 +1,28 @@
+- name: Check that the server's alive
+  action: ping
+  tags:
+    - ping
+
+- name: installing required system packages
+  yum: pkg={{ item }} state=present
+  sudo: yes
+  with_items:
+    - yum-utils
+  tags:
+    - yum
+    
+#- name: Install ntp 
+#  apt: name=ntp state=present
+#  tags: ntp
+#
+#- name: Configure ntp file
+#  template: src=ntp.conf.j2 dest=/etc/ntp.conf
+#  tags: ntp
+#  notify: restart ntp
+#
+#- name: Start the ntp service
+#  service: name=ntp state=started enabled=true
+#  tags: ntp
+  
+- name: Copy hosts file to /etc/hosts
+  template: src=hosts.j2 dest=/etc/hosts

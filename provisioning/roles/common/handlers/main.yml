@@ -1,0 +1,5 @@
+- name: reboot server
+  command: /sbin/reboot
+  
+- name: restart ntp
+  service: name=ntp state=restarted

@@ -1,0 +1,25 @@
+---
+- name: Install apache
+  yum: name=httpd state=present
+  
+- name: Setup Apache to use port 8080
+  template: src=httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
+  notify:
+  - restart apache
+
+#- name: Remove index.html
+#  command: rm /var/www/index.html removes=/var/www/index.html
+
+- name: Copy test.php to /var/www/
+  copy: src=test.php dest=/var/www/html
+
+#- name: Setup Warby Parker Test Site
+#  template: src=warby.conf.j2 dest=/etc/httpd/sites-available/warby.conf
+#
+#- name: Enable Warby Parker Test Site
+#  command: ln -s /etc/apache2/sites-available/warby.conf /etc/apache2/sites-enabled/warby.conf creates=/etc/apache2/sites-enabled/warby.conf
+#
+#- name: Remove default site
+#  command: rm /etc/apache2/sites-enabled/000-default removes=/etc/apache2/sites-enabled/000-default
+#  notify:
+#    - restart apache

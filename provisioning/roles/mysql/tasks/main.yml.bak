@@ -1,0 +1,78 @@
+---
+- name: Install Mysql package
+  apt: name={{ item }} state=present
+  with_items:
+  - mysql-server
+  - mysql-client
+  - python-mysqldb
+  
+- name: Start the MySQL service
+  action: service name=mysql state=started
+  
+- name: Configuration file, my.cnf
+  action: template src=etc-mysql-my-cnf.j2 dest=/etc/mysql/my.cnf
+  tags: mysql
+  
+#- name: Set the root password
+#  action: mysql_user user=root password={{ mysql_root_password }} host=localhost
+#  tags: mysql
+  
+#- name: update mysql root password for all root accounts
+#  sudo: yes
+#  mysql_user: name=root password={{ mysql_root_password }} host={{ item }} priv=*.*:ALL,GRANT
+#  with_items:
+#    - "{{ server_hostname }}"
+#    - 127.0.0.1
+#    - ::1
+#    - localhost
+
+- name: Config for easy access as root user
+  sudo: yes
+  action: template src=root-my-cnf.j2 dest=/home/vagrant/.my.cnf mode=0644
+  tags: mysql
+  
+- name: Config for easy access as root user
+  sudo: yes
+  action: template src=root-my-cnf.j2 dest=/root/.my.cnf mode=0644
+  tags: mysql
+
+#- name: Create a new database infratest
+#  sudo: yes
+#  mysql_db: name=infratest state=present collation=utf8_general_ci login_user=root login_password={{ mysql_infratest_password }}
+
+- name: Insert sample data
+  shell: mysql -uroot -p{{ mysql_root_password }} -hlocalhost -e ‘infratest’
+
+- name: Create a new database user infratest
+  mysql_user: name=infratest password={{ mysql_infratest_password }} priv=*.*:ALL state=present
+
+- name: Copy sample data
+  copy: src=test.sql dest=/tmp/test.sql
+
+- name: Insert sample data
+  shell: cat /tmp/test.sql | mysql -u infratest -p{{ mysql_infratest_password }} infratest
+
+- name: update mysql infratest password for all root accounts
+  sudo: yes
+  mysql_user: name=infratest password={{ mysql_infratest_password }} host={{ item }}
+  with_items:
+    - "{{ server_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: MySQL | Delete anonymous MySQL server user for {{ server_hostname }}
+  action: mysql_user user="" host="{{ server_hostname }}" state="absent"
+  tags: mysql
+
+- name: MySQL | Delete anonymous MySQL server user for localhost
+  action: mysql_user user="" state="absent"
+  tags: mysql
+
+- name: MySQL | Remove the MySQL test database
+  action: mysql_db db=test state=absent
+  tags: mysql
+
+- name: Restart MySQL
+  action: service name=mysql state=restarted
+  tags: mysql

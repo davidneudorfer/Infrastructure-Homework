@@ -1,0 +1,74 @@
+---
+- name: Install Mysql package
+  yum: name={{ item }} state=present
+  with_items:
+   - mysql-server
+   - MySQL-python
+   - libselinux-python
+   - libsemanage-python
+
+- name: Create Mysql configuration file
+  template: src=my.cnf.j2 dest=/etc/my.cnf
+  notify: 
+  - restart mysql
+
+- name: Start Mysql Service
+  service: name=mysqld state=started enabled=true
+  
+- name: MySQL | Set the root password.
+  action: mysql_user user=root password={{ mysql_root_password }} host=localhost
+  tags: mysql
+
+- name: MySQL | Config for easy access as root user
+  action: template src=root-my-cnf.j2 dest=/root/.my.cnf
+  tags: mysql
+
+#- name: MySQL | Delete anonymous MySQL server user for {{ server_hostname }}
+#  sudo: yes
+#  action: mysql_user user="" host="{{ server_hostname }}" state="absent"
+#  tags: mysql
+#
+#- name: MySQL | Delete anonymous MySQL server user for localhost
+#  action: mysql_user user="" state="absent"
+#  tags: mysql
+
+#- name: MySQL | Secure the MySQL root user for IPV6 localhost (::1)
+#  action: mysql_user user="root" password="{{ mysql_root_password }}" host="::1"
+#  tags: mysql
+
+#- name: MySQL | Secure the MySQL root user for IPV4 localhost (127.0.0.1)
+#  action: mysql_user user="root" password="{{ mysql_root_password }}" host="127.0.0.1"
+#  tags: mysql
+#
+#- name: MySQL | Secure the MySQL root user for localhost domain (localhost)
+#  action: mysql_user user="root" password="{{ mysql_root_password }}" host="localhost"
+#  tags: mysql
+#
+#- name: MySQL | Secure the MySQL root user for {{ server_hostname }} domain
+#  action: mysql_user user="root" password="{{ mysql_root_password }}" host="{{ server_hostname }}"
+#  tags: mysql
+
+#- name: MySQL | Remove the MySQL test database
+#  action: mysql_db db=test state=absent
+#  tags: mysql
+
+
+- name: Create a new database infratest
+  mysql_db: name=infratest state=present collation=utf8_general_ci
+  tags: mysql
+
+- name: Create a new user infratest
+  sudo: yes
+  mysql_user: name=infratest password={{ mysql_infratest_password }} priv=*.*:ALL state=present 
+  tags: mysql
+
+- name: Copy sample data
+  copy: src=test.sql dest=/tmp/test.sql
+  
+- name: Insert sample data
+  shell: cat /tmp/test.sql | mysql -u infratest -p{{ mysql_infratest_password }} infratest  
+    
+- name: Restart MySQL
+  action: service name=mysqld state=restarted
+  tags: mysql
+  

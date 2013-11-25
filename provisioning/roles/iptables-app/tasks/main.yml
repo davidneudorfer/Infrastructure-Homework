@@ -1,0 +1,16 @@
+#- name: copy iptables.rules to app
+#  sudo: yes
+#  template: src=iptables-app-rules.j2 dest=/etc/iptables.rules # owner=root group=root mode=0644
+#  notify:
+#  - reload iptables
+
+#setup iptables
+- name: iptables rules to app
+  template: src=iptables.rules dest=/etc/iptables.rules  
+
+#- name: configure iptables on app
+#  shell: /sbin/iptables-restore < /etc/iptables.rules
+#  ignore_errors: True
+  
+#- name: restart iptables on app
+#  service: name=iptables state=restarted enabled=yes

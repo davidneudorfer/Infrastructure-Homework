@@ -6,7 +6,7 @@ Requirements:
 - VirtualBox 4.2.16
 - Vagrant 1.2.3
 
-run :
+run :<br>
 `export PYTHONUNBUFFERED=1`<br>
 and<br>
 `export ANSIBLE_HOST_KEY_CHECKING=False`

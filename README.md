@@ -8,8 +8,8 @@ Requirements:
 
 run this:
 
-`export PYTHONUNBUFFERED=1`
-and
+`export PYTHONUNBUFFERED=1`<br>
+and<br>
 `export ANSIBLE_HOST_KEY_CHECKING=False`
 
 before running:

@@ -28,10 +28,9 @@ Vagrant.configure("2") do |config|
     node.vm.network :private_network, ip: "192.168.100.111"
     node.vm.provision :ansible do |ansible|
       ansible.playbook = "provisioning/site.yml"
-#      ansible.playbook = "remove-mysql.yml"
       ansible.host_key_checking = "false"
       ansible.inventory_file = "hosts"
-#      ansible.verbose = "vvvv"
+      ansible.verbose = "vvvv"
     end
   end
   

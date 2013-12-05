@@ -11,15 +11,16 @@
 - hosts: app
   sudo: yes
   roles:
+  - iptables-app
   - apache
   - mysql
   - php
-  - iptables-app
+
   
 # configure and deploy the frontend servers.
 - hosts: front
   sudo: yes
   roles:
+  - iptables-proxy
   - nginx
   - memcached
-  - iptables-front
